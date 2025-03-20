@@ -6,6 +6,7 @@ CLASS zcl_ysv_abap_course_basics DEFINITION
   PUBLIC SECTION.
 
     INTERFACES zif_abap_course_basics .
+    INTERFACES if_oo_adt_classrun.
   PROTECTED SECTION.
   PRIVATE SECTION.
 ENDCLASS.
@@ -13,6 +14,10 @@ ENDCLASS.
 
 
 CLASS zcl_ysv_abap_course_basics IMPLEMENTATION.
+
+  METHOD if_oo_adt_classrun~main.
+    out->write( 'HELLO SAP ABAP Labs Team' ) . "
+  ENDMETHOD.
 
 
   METHOD zif_abap_course_basics~calculator.
