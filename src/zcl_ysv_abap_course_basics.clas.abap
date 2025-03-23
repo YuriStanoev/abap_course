@@ -5,20 +5,20 @@ CLASS zcl_ysv_abap_course_basics DEFINITION
 
   PUBLIC SECTION.
 
-    INTERFACES zif_abap_course_basics .
     INTERFACES if_oo_adt_classrun.
+    INTERFACES zif_abap_course_basics.
+
   PROTECTED SECTION.
   PRIVATE SECTION.
 ENDCLASS.
 
 
-
 CLASS zcl_ysv_abap_course_basics IMPLEMENTATION.
 
   METHOD if_oo_adt_classrun~main.
-    out->write( 'HELLO SAP ABAP Labs Team' ) . "
+    DATA(result) = zif_abap_course_basics~hello_world( 'Yuri' ).
+    out->write( result ).
   ENDMETHOD.
-
 
   METHOD zif_abap_course_basics~calculator.
   ENDMETHOD.
@@ -27,7 +27,6 @@ CLASS zcl_ysv_abap_course_basics IMPLEMENTATION.
   METHOD zif_abap_course_basics~date_parsing.
   ENDMETHOD.
 
-
   METHOD zif_abap_course_basics~fizz_buzz.
   ENDMETHOD.
 
@@ -35,8 +34,9 @@ CLASS zcl_ysv_abap_course_basics IMPLEMENTATION.
   METHOD zif_abap_course_basics~get_current_date_time.
   ENDMETHOD.
 
-
   METHOD zif_abap_course_basics~hello_world.
+    DATA(user_id) = sy-uname.
+    rv_result = |Hello { iv_name }, your system user id { user_id }.|.
   ENDMETHOD.
 
 
