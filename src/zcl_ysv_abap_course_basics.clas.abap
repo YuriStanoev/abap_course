@@ -1,3 +1,4 @@
+
 CLASS zcl_ysv_abap_course_basics DEFINITION
   PUBLIC
   FINAL
@@ -36,7 +37,7 @@ CLASS zcl_ysv_abap_course_basics IMPLEMENTATION.
 
   METHOD zif_abap_course_basics~hello_world.
     DATA(user_id) = sy-uname.
-    rv_result = |Hello { iv_name }, your system user id { user_id }.|.
+    rv_result = |Hello { iv_name }, your system user id is { user_id }.|.
   ENDMETHOD.
 
 
@@ -51,3 +52,4 @@ CLASS zcl_ysv_abap_course_basics IMPLEMENTATION.
   METHOD zif_abap_course_basics~scrabble_score.
   ENDMETHOD.
 ENDCLASS.
+
