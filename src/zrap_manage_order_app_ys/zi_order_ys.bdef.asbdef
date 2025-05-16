@@ -1,0 +1,80 @@
+managed implementation in class zbp_i_order_ys unique;
+strict ( 2 );
+
+define behavior for ZI_ORDER_YS alias Order
+persistent table zorder_master
+lock master
+authorization master ( instance )
+etag master LocalLastChangedAt
+{
+  create;
+  update;
+  delete;
+
+  field ( readonly ) OrderID, CreationDate, CancellationDate, CompletionDate,
+                    TotalPrice, LocalLastChangedAt;
+  field ( mandatory ) Name, CustomerID, DeliveryCountry;
+  field ( readonly : update ) Status, OrderUUID;
+
+  action cancelOrder result [1] $self;
+  action completeOrder result [1] $self;
+
+  validation validateItems on save { create; update; }
+  determination calculateOrderID on save { create; }
+  determination setCreationDate on save { create; }
+
+  association _Items { create; }
+
+  mapping for zorder_master
+  {
+    OrderUUID = order_uuid;
+    OrderID = order_id;
+    Name = name;
+    Status = status;
+    CustomerID = customer_id;
+    CreationDate = creation_date;
+    CancellationDate = cancellation_date;
+    CompletionDate = completion_date;
+    DeliveryCountry = delivery_country;
+    TotalPrice = total_price;
+    CurrencyCode = currency_code;
+    CreatedBy = created_by;
+    CreatedAt = created_at;
+    LastChangedBy = last_changed_by;
+    LastChangedAt = last_changed_at;
+    LocalLastChangedAt = local_last_changed_at;
+  }
+}
+
+define behavior for ZI_ITEMS_YS alias Item
+persistent table zorder_items
+lock dependent by _Order
+authorization dependent by _Order
+etag master LocalLastChangedAt
+{
+  update;
+  delete;
+
+  field ( readonly ) OrderUUID, LocalLastChangedAt;
+  field ( readonly, numbering : managed ) ItemUUID;
+  field ( mandatory ) Name, Price, Quantity, CurrencyCode;
+
+  determination calculateItemTotalPrice on save { field Price, Quantity; }
+
+  association _Order;
+
+  mapping for zorder_items
+  {
+    ItemUUID = item_uuid;
+    OrderUUID = order_uuid;
+    Name = name;
+    Price = price;
+    CurrencyCode = currency_code;
+    Quantity = quantity;
+    CreatedBy = created_by;
+    CreatedAt = created_at;
+    LastChangedBy = last_changed_by;
+    LastChangedAt = last_changed_at;
+    LocalLastChangedAt = local_last_changed_at;
+  }
+}
