@@ -1,37 +1,43 @@
-managed implementation in class zbp_i_order_ys unique;
+managed implementation in class zbp_order_master unique;
 strict ( 2 );
 
 define behavior for ZI_ORDER_YS alias Order
 persistent table zorder_master
 lock master
 authorization master ( instance )
-etag master LocalLastChangedAt
+etag master LocalLastChanged
 {
   create;
   update;
   delete;
 
-  field ( readonly ) OrderID, CreationDate, CancellationDate, CompletionDate,
-                    TotalPrice, LocalLastChangedAt;
-  field ( mandatory ) Name, CustomerID, DeliveryCountry;
-  field ( readonly : update ) Status, OrderUUID;
-
-  action cancelOrder result [1] $self;
-  action completeOrder result [1] $self;
-
-  validation validateItems on save { create; update; }
-  determination calculateOrderID on save { create; }
-  determination setCreationDate on save { create; }
+  field ( readonly ) OrderUUID, OrderID, CreationDate, CancellationDate, CompletionDate, TotalPrice;
+  field ( numbering:managed ) OrderUUID;
+  field ( readonly : update ) CreatedBy, CreatedAt, LastChangedBy, LastChangedAt, LocalLastChanged;
+  field ( mandatory ) Name, Customer, DeliveryCountry;
 
   association _Items { create; }
 
+  // Actions
+  action ( features : instance ) cancelOrder result [1] $self;
+  action ( features : instance ) completeOrder result [1] $self;
+
+  // Determinations
+  determination setInitialStatus on modify { create; }
+  determination setOrderID on save { create; }
+  determination setCreationDate on save { create; }
+
+  // Validations
+  validation validateItemsExist on save { create; update; }
+
+  // Mapping
   mapping for zorder_master
   {
     OrderUUID = order_uuid;
     OrderID = order_id;
     Name = name;
     Status = status;
-    CustomerID = customer_id;
+    Customer = customer_id;
     CreationDate = creation_date;
     CancellationDate = cancellation_date;
     CompletionDate = completion_date;
@@ -42,7 +48,7 @@ etag master LocalLastChangedAt
     CreatedAt = created_at;
     LastChangedBy = last_changed_by;
     LastChangedAt = last_changed_at;
-    LocalLastChangedAt = local_last_changed_at;
+    LocalLastChanged = local_last_changed_at;
   }
 }
 
@@ -50,19 +56,22 @@ define behavior for ZI_ITEMS_YS alias Item
 persistent table zorder_items
 lock dependent by _Order
 authorization dependent by _Order
-etag master LocalLastChangedAt
+etag master LocalLastChanged
 {
   update;
   delete;
 
-  field ( readonly ) OrderUUID, LocalLastChangedAt;
-  field ( readonly, numbering : managed ) ItemUUID;
-  field ( mandatory ) Name, Price, Quantity, CurrencyCode;
-
-  determination calculateItemTotalPrice on save { field Price, Quantity; }
+  field ( readonly ) ItemUUID, OrderUUID;
+  field ( numbering:managed ) ItemUUID;
+  field ( readonly : update ) CreatedBy, CreatedAt, LastChangedBy, LastChangedAt, LocalLastChanged;
+  field ( mandatory ) Name, Price, Quantity;
 
   association _Order;
 
+  // Determinations
+  determination calculateItemTotal on modify { field Price, Quantity; }
+
+  // Mapping
   mapping for zorder_items
   {
     ItemUUID = item_uuid;
@@ -75,6 +84,6 @@ etag master LocalLastChangedAt
     CreatedAt = created_at;
     LastChangedBy = last_changed_by;
     LastChangedAt = last_changed_at;
-    LocalLastChangedAt = local_last_changed_at;
+    LocalLastChanged = local_last_changed_at;
   }
 }
