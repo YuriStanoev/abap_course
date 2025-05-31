@@ -1,0 +1,5 @@
+@EndUserText.label: 'Service Definition for Order Management'
+define service ZUI_ORDER_MANAGE {
+  expose ZC_ORDER_MASTER as Orders;
+  expose ZC_ORDER_ITEMS  as Items;
+}

@@ -21,7 +21,8 @@ define root view entity ZC_ORDER_MASTER
       CompletionDate,
       @Consumption.valueHelpDefinition: [{ entity: { name: 'I_Country', element: 'Country' } }]
       DeliveryCountry,
-      
+
+      Complexity,
       TotalPrice,
       CurrencyCode,
       

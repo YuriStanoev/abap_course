@@ -1,0 +1,87 @@
+@Metadata.layer: #CORE
+@UI: {
+  headerInfo: {
+    typeName: 'Order Item',
+    typeNamePlural: 'Order Items'
+//    title: { type: #STANDARD, value: 'Name' }
+  },
+  presentationVariant: [{
+    sortOrder: [{ by: 'Name', direction: #ASC }],
+    visualizations: [{type: #AS_LINEITEM}]
+  }]
+}
+annotate view ZC_ORDER_ITEMS with
+{
+@UI.facet: [
+    {
+      id: 'HeaderFacet',
+      purpose: #HEADER,
+      type: #FIELDGROUP_REFERENCE,
+      label: 'Item Information',
+      position: 10,
+      targetQualifier: 'HeaderGroup'
+    },
+    {
+      id: 'ItemDetails',
+      purpose: #STANDARD,
+      type: #FIELDGROUP_REFERENCE,
+      label: 'Item Details',
+      position: 20,
+      targetQualifier: 'DetailGroup'
+    }
+    ]
+    
+  @UI.hidden: true
+  ItemUUID;
+
+  @UI.hidden: true
+  OrderUUID;
+
+  @UI: {
+    lineItem: [{ position: 10, label: 'Name' }],
+    identification: [{ position: 10, label: 'Name' }],
+    fieldGroup: [
+    { qualifier: 'HeaderGroup', position: 10, label: 'Name' },
+    { qualifier: 'DetailGroup', position: 10, label: 'Name'}
+    ]
+  }
+  Name;
+
+  @UI: {
+    lineItem: [{ position: 20, label: 'Price' }],
+    identification: [{ position: 20, label: 'Price' }],
+    fieldGroup: [
+    { qualifier: 'HeaderGroup', position: 20, label: 'Price'},
+    { qualifier: 'DetailGroup', position: 20, label: 'Price' }
+    ]
+  }
+  Price;
+
+  @UI.hidden: true
+  CurrencyCode;
+
+  @UI: {
+    lineItem: [{ position: 30, label: 'Quantity' }],
+    identification: [{ position: 30, label: 'Quantity' }],
+    fieldGroup: [
+    { qualifier: 'HeaderGroup', position: 30, label: 'Quantity'},
+    { qualifier: 'DetailGroup', position:30, label: 'Quantity' }
+    ]
+  }
+  Quantity;
+
+  @UI.hidden: true
+  CreatedBy;
+
+  @UI.hidden: true
+  CreatedAt;
+
+  @UI.hidden: true
+  LastChangedBy;
+
+  @UI.hidden: true
+  LastChangedAt;
+
+  @UI.hidden: true
+  LocalLastChanged;
+}

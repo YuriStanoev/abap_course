@@ -1,0 +1,151 @@
+@Metadata.layer: #CORE
+@UI: {
+  headerInfo: {
+    typeName: 'Order',
+    typeNamePlural: 'Orders'
+//    title: { type: #STANDARD, value: 'OrderID' },
+ //   description: { type: #STANDARD, value: 'Name' }
+  },
+  presentationVariant: [ {
+    sortOrder: [ { by: 'CreationDate', direction: #DESC } ],
+    visualizations: [ { type: #AS_LINEITEM } ]
+  } ]
+}
+annotate view ZC_ORDER_MASTER with
+{
+
+  @UI.facet: [
+   {
+     id: 'HeaderFacet',
+     purpose: #HEADER,
+     type: #FIELDGROUP_REFERENCE,
+     label: 'Order Information',
+     position: 10,
+     targetQualifier: 'HeaderGroup'
+   },
+   {
+     id: 'OrderDetails',
+     purpose: #STANDARD,
+     type: #FIELDGROUP_REFERENCE,
+     label: 'Order Details',
+     position: 20,
+     targetQualifier: 'DetailGroup'
+   },
+   {
+     id: 'Items',
+     purpose: #STANDARD,
+     type: #LINEITEM_REFERENCE,
+     label: 'Items',
+     position: 30,
+     targetElement: '_Items'
+   }
+  ]
+
+
+  @UI.hidden: true
+  OrderUUID;
+
+
+
+  @UI: {
+    identification: [ { position: 10, label: 'Order ID' } ],
+    lineItem: [
+    { position: 10 },
+    { type: #FOR_ACTION, dataAction: 'cancelOrder', label: 'Cancel Order', position: 10 },
+    { type: #FOR_ACTION, dataAction: 'completeOrder', label: 'Complete Order', position: 20 }
+  ],
+    selectionField: [ { position: 10 } ],
+    fieldGroup: [ { qualifier: 'HeaderGroup', position: 10, label: 'Order ID'  } ]
+  }
+  OrderID;
+
+  @UI: {
+    identification: [ { position: 20, label: 'Name' } ],
+    lineItem: [ { position: 20, label: 'Name' } ],
+    fieldGroup: [
+      { qualifier: 'HeaderGroup', position: 20, label: 'Name' },
+      { qualifier: 'DetailGroup', position: 10, label: 'Name'  }
+    ]
+  }
+  Name;
+
+  @UI: {
+    identification: [ { position: 30, label: 'Status' } ],
+    lineItem: [ { position: 30, label: 'Status' } ],
+    selectionField: [ { position: 20 } ],
+    fieldGroup: [ { qualifier: 'DetailGroup', position: 30, label: 'Status' } ]
+  }
+  Status;
+
+  @UI: {
+    identification: [ { position: 40, label: 'Customer' } ],
+    lineItem: [ { position: 40, label: 'Customer' } ],
+    selectionField: [ { position: 30 } ],
+    fieldGroup: [ { qualifier: 'DetailGroup', position: 20, label: 'Customer' } ]
+  }
+  Customer;
+
+  @UI.hidden: true
+  CustomerName;
+
+  @UI: {
+    identification: [ { position: 50, label: 'Creation Date' } ],
+    lineItem: [ { position: 50, label: 'Creation Date'  } ],
+    selectionField: [ { position: 40 } ],
+    fieldGroup: [ { qualifier: 'DetailGroup', position: 60, label: 'Creation Date'  } ]
+  }
+  CreationDate;
+
+  @UI: {
+    identification: [ { position: 60, label: 'Completion Date'  } ],
+    fieldGroup: [ { qualifier: 'DetailGroup', position: 70, label: 'Completion Date' } ]
+  }
+  CompletionDate;
+
+  @UI: {
+    identification: [ { position: 70, label: 'Cancellation Date' } ],
+    fieldGroup: [ { qualifier: 'DetailGroup', position: 80, label: 'Cancellation Date'  } ]
+  }
+  CancellationDate;
+
+  @UI: {
+    identification: [ { position: 80, label: 'Country'  } ],
+    fieldGroup: [ { qualifier: 'DetailGroup', position: 40, label: 'Country'   } ]
+  }
+  DeliveryCountry;
+    
+  @UI: {
+    identification: [ { position: 90, label: 'Total Price' } ],
+    lineItem: [ { position: 90, label: 'Total Price'} ],
+    fieldGroup: [ { qualifier: 'DetailGroup', position: 50, label: 'Total Price' } ]
+  }
+
+  TotalPrice;
+
+  @UI.hidden: true
+  CurrencyCode;
+
+  @UI: {
+    identification: [ { position: 100, label: 'Complexity' } ],
+    lineItem: [ { position: 60, label: 'Complexity' } ],
+    fieldGroup: [ { qualifier: 'DetailGroup', position: 100, label: 'Complexity'} ]
+    }
+  Complexity;
+
+
+  @UI.hidden: true
+  CreatedBy;
+
+  @UI.hidden: true
+  CreatedAt;
+
+  @UI.hidden: true
+  LastChangedBy;
+
+  @UI.hidden: true
+  LastChangedAt;
+
+  @UI.hidden: true
+  LocalLastChanged;
+
+}
