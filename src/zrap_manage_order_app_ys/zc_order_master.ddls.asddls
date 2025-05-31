@@ -11,11 +11,22 @@ define root view entity ZC_ORDER_MASTER
       OrderID,
       @Search.defaultSearchElement: true
       Name,
+      @ObjectModel.text.element: [ 'StatusText' ]
+      @EndUserText.label: 'Status'
+      @Consumption.valueHelpDefinition:
+      [{ entity: { name : 'ZI_DOMAIN_FIXED_VAL' , element: 'low' } ,
+                   additionalBinding: [{ element: 'domain_name',
+                   localConstant: 'ZORDER_STATUS_YS', usage: #FILTER }]
+                   , distinctValues: true
+      }]
       Status,
+      @EndUserText.label: 'Status Description'
+      @UI.hidden: true
+      StatusText,
       @Search.defaultSearchElement: true
       @Consumption.valueHelpDefinition: [{ entity: { name: '/DMO/I_Customer', element: 'CustomerID' } }]
       Customer,
-      _Customer.LastName as CustomerName,
+      _Customer.LastName      as CustomerName,
       CreationDate,
       CancellationDate,
       CompletionDate,
@@ -25,17 +36,19 @@ define root view entity ZC_ORDER_MASTER
       Complexity,
       TotalPrice,
       CurrencyCode,
-      
-      
+
+
       // Administrative fields
       CreatedBy,
       CreatedAt,
       LastChangedBy,
       LastChangedAt,
       LocalLastChanged,
-      
+
       // Associations
       _Items : redirected to composition child ZC_ORDER_ITEMS,
+
       _Customer,
-      _Country
+      _Country,
+      _StatusText
 }

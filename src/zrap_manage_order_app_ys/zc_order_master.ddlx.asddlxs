@@ -71,10 +71,11 @@ annotate view ZC_ORDER_MASTER with
 
   @UI: {
     identification: [ { position: 30, label: 'Status' } ],
-    lineItem: [ { position: 30, label: 'Status' } ],
+    lineItem: [ { position: 30, label: 'Status', importance: #HIGH } ],
     selectionField: [ { position: 20 } ],
     fieldGroup: [ { qualifier: 'DetailGroup', position: 30, label: 'Status' } ]
   }
+  @UI.textArrangement: #TEXT_ONLY
   Status;
 
   @UI: {

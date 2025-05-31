@@ -47,10 +47,10 @@ CLASS lhc_Order IMPLEMENTATION.
 
     result = VALUE #( FOR ls_order IN lt_orders INDEX INTO i
                      ( %tky = ls_order-%tky
-                       %features-%action-cancelOrder = COND #( WHEN ls_order-Status = 'In Process'
+                       %features-%action-cancelOrder = COND #( WHEN ls_order-Status = 'P'
                                                               THEN if_abap_behv=>fc-o-enabled
                                                               ELSE if_abap_behv=>fc-o-disabled )
-                       %features-%action-completeOrder = COND #( WHEN ls_order-Status = 'In Process'
+                       %features-%action-completeOrder = COND #( WHEN ls_order-Status = 'P'
                                                                 THEN if_abap_behv=>fc-o-enabled
                                                                 ELSE if_abap_behv=>fc-o-disabled )
                       " %update = COND #( WHEN ls_order-Status = 'In Process'
@@ -70,7 +70,7 @@ CLASS lhc_Order IMPLEMENTATION.
       ENTITY Order
         UPDATE FIELDS ( Status CancellationDate )
         WITH VALUE #( FOR key IN keys ( %tky = key-%tky
-                                       Status = 'Cancelled'
+                                       Status = 'X'
                                        CancellationDate = cl_abap_context_info=>get_system_date( ) ) )
       REPORTED DATA(ls_reported).
 
@@ -90,7 +90,7 @@ CLASS lhc_Order IMPLEMENTATION.
       ENTITY Order
         UPDATE FIELDS ( Status CompletionDate )
         WITH VALUE #( FOR key IN keys ( %tky = key-%tky
-                                       Status = 'Completed'
+                                       Status = 'C'
                                        CompletionDate = cl_abap_context_info=>get_system_date( ) ) )
       REPORTED DATA(ls_reported).
 
@@ -147,7 +147,7 @@ CLASS lhc_Order IMPLEMENTATION.
       ENTITY Order
         UPDATE FIELDS ( Status )
         WITH VALUE #( FOR key IN keys ( %tky = key-%tky
-                                       Status = 'In Process' ) )
+                                       Status = 'P' ) )
       REPORTED DATA(ls_reported).
   ENDMETHOD.
 

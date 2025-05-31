@@ -10,14 +10,16 @@
 
 define root view entity ZI_ORDER_YS
   as select from zorder_master
-  composition [0..*] of ZI_ITEMS_YS     as _Items
-  association [0..1] to /DMO/I_Customer as _Customer on $projection.Customer = _Customer.CustomerID
-  association [0..1] to I_Country       as _Country  on $projection.DeliveryCountry = _Country.Country
+  composition [0..*] of ZI_ITEMS_YS           as _Items
+  association [0..1] to /DMO/I_Customer       as _Customer   on $projection.Customer = _Customer.CustomerID
+  association [0..1] to I_Country             as _Country    on $projection.DeliveryCountry = _Country.Country
+  association [0..1] to ZI_DOMAIN_STATUS_TEXT as _StatusText on $projection.Status = _StatusText.DomainValue
 {
   key order_uuid                as OrderUUID,
       order_id                  as OrderID,
       name                      as Name,
       status                    as Status,
+      _StatusText.description   as StatusText,
       customer_id               as Customer,
       creation_date             as CreationDate,
       cancellation_date         as CancellationDate,
@@ -44,5 +46,6 @@ define root view entity ZI_ORDER_YS
       // Associations
       _Items,
       _Customer,
-      _Country
+      _Country,
+      _StatusText
 }
