@@ -35,13 +35,13 @@ CLASS lhc_Item IMPLEMENTATION.
 
     LOOP AT lt_order_uuids INTO DATA(lv_order_uuid).
       APPEND VALUE #( %tky-OrderUUID = lv_order_uuid
-                     %control-TotalPrice = if_abap_behv=>mk-on ) TO lt_order_update.
+                     %control-OrderUUID = if_abap_behv=>mk-on ) TO lt_order_update.
     ENDLOOP.
 
     " This will trigger the calculateTotalPrice determination on the Order entity
     MODIFY ENTITIES OF zi_order_ys IN LOCAL MODE
       ENTITY Order
-      UPDATE FIELDS ( TotalPrice ) WITH lt_order_update
+      UPDATE FIELDS ( OrderUUID ) WITH lt_order_update
       REPORTED DATA(ls_reported)
       FAILED DATA(ls_failed).
   ENDMETHOD.

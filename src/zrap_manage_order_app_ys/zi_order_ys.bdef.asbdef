@@ -84,6 +84,8 @@ etag master LocalLastChanged
 
   // Determinations
   determination calculateItemTotal on modify { field Price, Quantity; }
+  //determination recalculateOrderTotal on modify { field Price, Quantity; }
+
   //Validation
   validation validateMandatoryItemFields on save { create; update; }
 
