@@ -15,7 +15,7 @@ etag master LocalLastChanged
   delete;
 
   field ( numbering:managed ) OrderUUID;
-  field ( readonly ) OrderUUID, OrderID, CreationDate, CancellationDate, CompletionDate, TotalPrice, Status, Complexity;
+  field ( readonly ) OrderUUID, OrderID, CreationDate, CancellationDate, CompletionDate, Status;
   field ( readonly : update ) CreatedBy, CreatedAt, LastChangedBy, LastChangedAt, LocalLastChanged;
   field ( mandatory ) Name, Customer, DeliveryCountry;
 
@@ -29,7 +29,7 @@ etag master LocalLastChanged
   determination setInitialStatus on modify { create; }
   determination setOrderID on save { create; }
   determination setCreationDate on save { create; }
-  determination calculateTotalPrice on modify { field OrderUUID; }
+
   determination calculateComplexity on modify { field OrderUUID; }
   // Validations
   validation validateMandatoryFields on save { create;update; }
@@ -54,7 +54,6 @@ etag master LocalLastChanged
     CancellationDate = cancellation_date;
     CompletionDate   = completion_date;
     DeliveryCountry  = delivery_country;
-    TotalPrice       = total_price;
     CurrencyCode     = currency_code;
     CreatedBy        = created_by;
     CreatedAt        = created_at;
@@ -84,7 +83,7 @@ etag master LocalLastChanged
 
   // Determinations
   determination calculateItemTotal on modify { field Price, Quantity; }
-  //determination recalculateOrderTotal on modify { field Price, Quantity; }
+
 
   //Validation
   validation validateMandatoryItemFields on save { create; update; }

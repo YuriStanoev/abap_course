@@ -1,5 +1,5 @@
 @AbapCatalog.viewEnhancementCategory: [#NONE]
-@AccessControl.authorizationCheck: #CHECK
+@AccessControl.authorizationCheck: #NOT_REQUIRED
 @EndUserText.label: 'Orders Master View'
 @Metadata.ignorePropagatedAnnotations: true
 @ObjectModel.usageType:{
@@ -19,18 +19,14 @@ define root view entity ZI_ORDER_YS
       order_id                  as OrderID,
       name                      as Name,
       status                    as Status,
-      _StatusText.description   as StatusText,
+      _StatusText.Description   as StatusText,
       customer_id               as Customer,
       creation_date             as CreationDate,
       cancellation_date         as CancellationDate,
       completion_date           as CompletionDate,
       delivery_country          as DeliveryCountry,
-      @Semantics.amount.currencyCode: 'CurrencyCode'
-      total_price               as TotalPrice,
       currency_code             as CurrencyCode,
-
-      cast('' as abap.char(10)) as Complexity,
-
+      
       // Administrative fields
       @Semantics.user.createdBy: true
       created_by                as CreatedBy,

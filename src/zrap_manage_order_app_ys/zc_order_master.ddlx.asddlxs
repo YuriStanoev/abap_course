@@ -123,13 +123,13 @@ annotate view ZC_ORDER_MASTER with
 
   TotalPrice;
 
-  @UI.hidden: true
+  @UI.hidden: false
   CurrencyCode;
 
   @UI: {
-    identification: [ { position: 100, label: 'Complexity' } ],
-    lineItem: [ { position: 60, label: 'Complexity' } ],
-    fieldGroup: [ { qualifier: 'DetailGroup', position: 100, label: 'Complexity'} ]
+    identification: [ { position: 100, label: 'Order Complexity' } ],
+    lineItem: [ { position: 60, label: 'Order Complexity' } ],
+    fieldGroup: [ { qualifier: 'DetailGroup', position: 100, label: 'Order Complexity'} ]
     }
   Complexity;
 

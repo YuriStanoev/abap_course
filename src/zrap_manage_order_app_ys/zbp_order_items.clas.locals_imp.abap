@@ -38,7 +38,7 @@ CLASS lhc_Item IMPLEMENTATION.
                      %control-OrderUUID = if_abap_behv=>mk-on ) TO lt_order_update.
     ENDLOOP.
 
-    " This will trigger the calculateTotalPrice determination on the Order entity
+    " Trigger the calculateTotalPrice determination on the Order entity
     MODIFY ENTITIES OF zi_order_ys IN LOCAL MODE
       ENTITY Order
       UPDATE FIELDS ( OrderUUID ) WITH lt_order_update

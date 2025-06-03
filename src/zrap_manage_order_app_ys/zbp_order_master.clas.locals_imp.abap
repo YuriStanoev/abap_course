@@ -13,9 +13,6 @@ CLASS lhc_Order DEFINITION INHERITING FROM cl_abap_behavior_handler.
     METHODS completeOrder FOR MODIFY
       IMPORTING keys FOR ACTION Order~completeOrder RESULT result.
 
-    METHODS calculateComplexity FOR DETERMINE ON MODIFY
-      IMPORTING keys FOR Order~calculateComplexity.
-
     METHODS setInitialStatus FOR DETERMINE ON MODIFY
       IMPORTING keys FOR Order~setInitialStatus.
 
@@ -28,13 +25,12 @@ CLASS lhc_Order DEFINITION INHERITING FROM cl_abap_behavior_handler.
     METHODS validateItemsExist FOR VALIDATE ON SAVE
       IMPORTING keys FOR Order~validateItemsExist.
 
-    METHODS calculateTotalPrice FOR DETERMINE ON MODIFY
-      IMPORTING keys FOR Order~calculateTotalPrice.
+
 
     METHODS validateMandatoryFields FOR VALIDATE ON SAVE
       IMPORTING keys FOR Order~validateMandatoryFields.
 
-ENDCLASS.
+  ENDCLASS.
 
 CLASS lhc_Order IMPLEMENTATION.
 
@@ -103,43 +99,6 @@ CLASS lhc_Order IMPLEMENTATION.
     " Set the action result
     result = VALUE #( FOR order IN lt_orders ( %tky = order-%tky
                                               %param = order ) ).
-  ENDMETHOD.
-
-  METHOD calculateComplexity.
-    READ ENTITIES OF zi_order_ys IN LOCAL MODE
-    ENTITY Order
-      FIELDS ( OrderUUID )
-      WITH CORRESPONDING #( keys )
-    RESULT DATA(orders).
-
-    IF orders IS INITIAL.
-      RETURN.
-    ENDIF.
-
-    LOOP AT orders ASSIGNING FIELD-SYMBOL(<order>).
-
-      READ ENTITIES OF zi_order_ys IN LOCAL MODE
-        ENTITY Order
-          BY \_Items
-          FIELDS ( ItemUUID )
-          WITH VALUE #( ( %tky = <order>-%tky ) )
-        RESULT DATA(items).
-
-      DATA(item_count) = lines( items ).
-      DATA(complexity) = COND string(
-          WHEN item_count < 3 THEN 'Easy'
-          WHEN item_count <= 4 THEN 'Medium'
-          ELSE 'Complex' ).
-
-      MODIFY ENTITIES OF zi_order_ys IN LOCAL MODE
-        ENTITY Order
-          UPDATE FIELDS ( Complexity )
-          WITH VALUE #( ( %tky = <order>-%tky
-                          Complexity = complexity ) )
-          REPORTED DATA(ls_reported).
-
-    ENDLOOP.
-
   ENDMETHOD.
 
   METHOD setInitialStatus.
@@ -225,97 +184,7 @@ CLASS lhc_Order IMPLEMENTATION.
       ENDIF.
     ENDLOOP.
   ENDMETHOD.
-  METHOD calculateTotalPrice.
-    TYPES: BEGIN OF ty_item,
-             item_uuid     TYPE zorder_items-item_uuid,
-             price         TYPE zorder_items-price,
-             quantity      TYPE zorder_items-quantity,
-             currency_code TYPE zorder_items-currency_code,
-           END OF ty_item.
 
-    DATA: lt_order_updates TYPE TABLE FOR UPDATE zi_order_ys.
-
-    LOOP AT keys ASSIGNING FIELD-SYMBOL(<key>).
-
-      DATA: total_price              TYPE p LENGTH 15 DECIMALS 2 VALUE 0,
-            currency                 TYPE /dmo/currency_code,
-            lt_items_mem             TYPE STANDARD TABLE OF ty_item WITH EMPTY KEY,
-            lt_items_db              TYPE STANDARD TABLE OF ty_item WITH EMPTY KEY,
-            lt_items_combined        TYPE STANDARD TABLE OF ty_item WITH EMPTY KEY,
-            lt_item_uuids_to_exclude TYPE HASHED TABLE OF zorder_items-item_uuid
-                                      WITH UNIQUE KEY table_line.
-
-      " Get in-memory OrderItem entities
-      READ ENTITIES OF zi_order_ys IN LOCAL MODE
-        ENTITY Order BY \_Items
-        FIELDS ( itemuuid price quantity currencycode )
-        WITH VALUE #( ( %tky = <key>-%tky ) )
-        RESULT DATA(lt_items_all).
-
-      LOOP AT lt_items_all INTO DATA(ls_mem).
-        APPEND VALUE ty_item(
-          item_uuid     = ls_mem-itemuuid
-          price         = ls_mem-price
-          quantity      = ls_mem-quantity
-          currency_code = ls_mem-currencycode
-        ) TO lt_items_mem.
-
-        IF ls_mem-itemuuid IS NOT INITIAL.
-          INSERT ls_mem-itemuuid INTO TABLE lt_item_uuids_to_exclude.
-        ENDIF.
-      ENDLOOP.
-
-      " Read remaining items from DB
-      IF lt_item_uuids_to_exclude IS INITIAL.
-        SELECT item_uuid, price, quantity, currency_code
-          FROM zorder_items
-          WHERE order_uuid = @<key>-%tky-OrderUUID
-          INTO TABLE @lt_items_db.
-      ELSE.
-        DATA lt_uuids_exclude TYPE STANDARD TABLE OF zorder_items-item_uuid WITH EMPTY KEY.
-
-        LOOP AT lt_item_uuids_to_exclude INTO DATA(uuid).
-          APPEND uuid TO lt_uuids_exclude.
-        ENDLOOP.
-        SELECT item_uuid, price, quantity, currency_code
-          FROM zorder_items
-          FOR ALL ENTRIES IN @lt_uuids_exclude
-          WHERE order_uuid = @<key>-%tky-OrderUUID
-            AND item_uuid <> @lt_uuids_exclude-table_line
-          INTO TABLE @lt_items_db.
-      ENDIF.
-
-      " Combine in-memory + DB items
-      APPEND LINES OF lt_items_mem TO lt_items_combined.
-      APPEND LINES OF lt_items_db  TO lt_items_combined.
-
-      IF lt_items_combined IS INITIAL.
-        CONTINUE.
-      ENDIF.
-
-      LOOP AT lt_items_combined INTO DATA(ls_item).
-        total_price = total_price + ( ls_item-price * ls_item-quantity ).
-        IF currency IS INITIAL AND ls_item-currency_code IS NOT INITIAL.
-          currency = ls_item-currency_code.
-        ENDIF.
-      ENDLOOP.
-
-      APPEND VALUE #(
-        %tky         = <key>-%tky
-        TotalPrice   = total_price
-        CurrencyCode = currency
-      ) TO lt_order_updates.
-
-    ENDLOOP.
-
-    IF lt_order_updates IS NOT INITIAL.
-      MODIFY ENTITIES OF zi_order_ys IN LOCAL MODE
-        ENTITY Order
-        UPDATE FIELDS ( TotalPrice CurrencyCode )
-        WITH lt_order_updates
-        REPORTED DATA(ls_reported).
-    ENDIF.
-  ENDMETHOD.
 
   METHOD validateMandatoryFields.
     READ ENTITIES OF zi_order_ys IN LOCAL MODE
