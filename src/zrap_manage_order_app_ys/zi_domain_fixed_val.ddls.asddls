@@ -10,7 +10,7 @@ define custom entity ZI_DOMAIN_FIXED_VAL
   key pos         : abap.numc( 4 );
 
       @EndUserText.label : 'Value'
-      @ObjectModel.text.element: ['description'] //  Link technical value to description
+      @ObjectModel.text.element: ['description'] 
       low         : abap.char( 20 );
 
       @EndUserText.label : 'upper_limit'

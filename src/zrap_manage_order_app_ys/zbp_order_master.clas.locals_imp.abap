@@ -30,7 +30,7 @@ CLASS lhc_Order DEFINITION INHERITING FROM cl_abap_behavior_handler.
     METHODS validateMandatoryFields FOR VALIDATE ON SAVE
       IMPORTING keys FOR Order~validateMandatoryFields.
 
-  ENDCLASS.
+ENDCLASS.
 
 CLASS lhc_Order IMPLEMENTATION.
 
@@ -49,12 +49,19 @@ CLASS lhc_Order IMPLEMENTATION.
                        %features-%action-completeOrder = COND #( WHEN ls_order-Status = 'P'
                                                                 THEN if_abap_behv=>fc-o-enabled
                                                                 ELSE if_abap_behv=>fc-o-disabled )
-                      " %update = COND #( WHEN ls_order-Status = 'In Process'
-                     "                  THEN if_abap_behv=>fc-o-enabled
-                      "                ELSE if_abap_behv=>fc-o-disabled )
-                      "%delete = COND #( WHEN ls_order-Status = 'In Process'
-                       "                 THEN if_abap_behv=>fc-o-enabled
-                        "                ELSE if_abap_behv=>fc-o-disabled )
+                      %action-Edit = COND #( WHEN ls_order-Status = 'C'
+                                       THEN if_abap_behv=>fc-o-disabled
+                                      ELSE if_abap_behv=>fc-o-enabled )
+
+                                      %features-%update = COND #( WHEN ls_order-Status = 'C' OR
+                                                         ls_order-Status = 'X'
+                                                  THEN if_abap_behv=>fc-o-disabled
+                                                  ELSE if_abap_behv=>fc-o-enabled )
+
+                       %features-%delete = COND #( WHEN ls_order-Status = 'P'
+                                                  THEN if_abap_behv=>fc-o-enabled
+                                                  ELSE if_abap_behv=>fc-o-disabled )
+
                      ) ).
   ENDMETHOD.
 
@@ -186,46 +193,71 @@ CLASS lhc_Order IMPLEMENTATION.
   ENDMETHOD.
 
 
+
   METHOD validateMandatoryFields.
     READ ENTITIES OF zi_order_ys IN LOCAL MODE
-        ENTITY Order
-          FIELDS ( Name Customer DeliveryCountry )
-          WITH CORRESPONDING #( keys )
-        RESULT DATA(lt_orders).
+    ENTITY Order
+    ALL FIELDS WITH CORRESPONDING #( keys )
+    RESULT DATA(lt_orderdata)
+    REPORTED DATA(lt_reported)
+    FAILED DATA(lt_failed).
 
-    LOOP AT lt_orders INTO DATA(ls_order).
+    LOOP AT lt_orderdata INTO DATA(ls_orderdata).
 
-      " Validate Name
-      IF ls_order-Name IS INITIAL.
-        APPEND VALUE #( %tky = ls_order-%tky ) TO failed-order.
-        APPEND VALUE #( %tky = ls_order-%tky
-                       %msg = new_message_with_text(
-                         severity = if_abap_behv_message=>severity-error
-                         text = 'Name is mandatory' )
-                       %element-Name = if_abap_behv=>mk-on ) TO reported-order.
+      DATA(lv_has_error) = abap_false.
+
+      " Check Name
+      IF ls_orderdata-Name IS INITIAL.
+        lv_has_error = abap_true.
+        APPEND VALUE #(
+        %tky = ls_orderdata-%tky
+        %state_area = 'VALIDATE_NAME'
+        %msg = new_message(
+        id = 'SY'
+        number = '002'
+        v1 = 'Name of the Order is Mandatory'
+        severity = if_abap_behv_message=>severity-error )
+        %element-Name = if_abap_behv=>mk-on
+        ) TO reported-order.
       ENDIF.
 
-      " Validate Customer
-      IF ls_order-Customer IS INITIAL.
-        APPEND VALUE #( %tky = ls_order-%tky ) TO failed-order.
-        APPEND VALUE #( %tky = ls_order-%tky
-                       %msg = new_message_with_text(
-                         severity = if_abap_behv_message=>severity-error
-                         text = 'Customer is mandatory' )
-                       %element-Customer = if_abap_behv=>mk-on ) TO reported-order.
+      " Check Customer
+      IF ls_orderdata-Customer IS INITIAL.
+        lv_has_error = abap_true.
+        APPEND VALUE #(
+        %tky = ls_orderdata-%tky
+        %state_area = 'VALIDATE_CUSTOMERID'
+        %msg = new_message(
+        id = 'SY'
+        number = '002'
+        v1 = 'Customer ID is Mandatory'
+        severity = if_abap_behv_message=>severity-error )
+        %element-Customer = if_abap_behv=>mk-on
+        ) TO reported-order.
       ENDIF.
 
-      " Validate DeliveryCountry
-      IF ls_order-DeliveryCountry IS INITIAL.
-        APPEND VALUE #( %tky = ls_order-%tky ) TO failed-order.
-        APPEND VALUE #( %tky = ls_order-%tky
-                       %msg = new_message_with_text(
-                         severity = if_abap_behv_message=>severity-error
-                         text = 'Delivery Country is mandatory' )
-                       %element-DeliveryCountry = if_abap_behv=>mk-on ) TO reported-order.
+      " Check DeliveryCountry
+      IF ls_orderdata-DeliveryCountry IS INITIAL.
+        lv_has_error = abap_true.
+        APPEND VALUE #(
+        %tky = ls_orderdata-%tky
+        %state_area = 'VALIDATE_DELIVERY_COUNTRY'
+        %msg = new_message(
+        id = 'SY'
+        number = '002'
+        v1 = 'Delivery Country for the Order is Mandatory'
+        severity = if_abap_behv_message=>severity-error )
+        %element-DeliveryCountry = if_abap_behv=>mk-on
+        ) TO reported-order.
+      ENDIF.
+
+      " If any field is missing, mark the whole record as failed
+      IF lv_has_error = abap_true.
+        APPEND VALUE #( %tky = ls_orderdata-%tky ) TO failed-order.
       ENDIF.
 
     ENDLOOP.
+
   ENDMETHOD.
 
 ENDCLASS.

@@ -88,7 +88,6 @@ CLASS zcl_get_domain_fix_values IMPLEMENTATION.
 
         DATA(exception_t100_key) = cl_message_helper=>get_latest_t100_exception( exception )->t100key.
 
-        "do some exception handling
 
     ENDTRY.
   ENDMETHOD.

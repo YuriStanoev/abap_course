@@ -23,7 +23,7 @@ ENDCLASS.
 CLASS zcl_order_complexity_calc IMPLEMENTATION.
 
   METHOD if_sadl_exit_calc_element_read~get_calculation_info.
-    " Specify which original fields are needed for calculation
+
     LOOP AT it_requested_calc_elements INTO DATA(ls_calc_element).
       CASE ls_calc_element.
         WHEN 'COMPLEXITY'.
@@ -42,7 +42,7 @@ CLASS zcl_order_complexity_calc IMPLEMENTATION.
     " Calculate complexity for each order
     LOOP AT lt_original_data INTO DATA(ls_original_data).
 
-      " Count order items using your existing table
+      " Count order items using existing table
       SELECT COUNT(*)
         FROM zorder_items
         WHERE order_uuid = @ls_original_data-OrderUUID

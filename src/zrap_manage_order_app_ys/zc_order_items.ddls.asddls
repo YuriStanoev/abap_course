@@ -8,6 +8,8 @@ define view entity ZC_ORDER_ITEMS
       OrderUUID,
       Name,
       Price,
+      @EndUserText.label: 'Currency'
+      @Semantics.currencyCode: true
       CurrencyCode,
       Quantity,
       

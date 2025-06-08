@@ -11,8 +11,8 @@ authorization master ( instance )
 etag master LocalLastChanged
 {
   create;
-  update;
-  delete;
+  update( features : instance) ;
+  delete( features : instance) ;
 
   field ( numbering:managed ) OrderUUID;
   field ( readonly ) OrderUUID, OrderID, CreationDate, CancellationDate, CompletionDate, Status;
@@ -21,9 +21,11 @@ etag master LocalLastChanged
 
   association _Items { create; with draft; }
 
+
   // Actions
   action ( features : instance ) cancelOrder result [1] $self;
   action ( features : instance ) completeOrder result [1] $self;
+
 
   // Determinations
   determination setInitialStatus on modify { create; }
@@ -32,17 +34,14 @@ etag master LocalLastChanged
 
   determination calculateComplexity on modify { field OrderUUID; }
   // Validations
-  validation validateMandatoryFields on save { create;update; }
+  validation validateMandatoryFields on save { create; update; }
   validation validateItemsExist on save { create; update; }
   draft determine action Prepare {
   validation validateItemsExist;
   validation validateMandatoryFields;
   }
 
-
-
-
-  // Mapping
+   // Mapping
   mapping for zorder_master
   {
     OrderUUID        = order_uuid;
@@ -77,7 +76,7 @@ etag master LocalLastChanged
   field ( numbering:managed ) ItemUUID;
   field ( readonly ) ItemUUID, OrderUUID;
   field ( readonly : update ) CreatedBy, CreatedAt, LastChangedBy, LastChangedAt, LocalLastChanged;
-  field ( mandatory ) Name, Price, Quantity;
+  field ( mandatory ) Name, Price, Quantity,CurrencyCode;
 
   association _Order { with draft; }
 

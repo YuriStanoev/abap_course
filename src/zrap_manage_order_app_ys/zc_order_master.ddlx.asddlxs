@@ -2,9 +2,9 @@
 @UI: {
   headerInfo: {
     typeName: 'Order',
-    typeNamePlural: 'Orders'
-//    title: { type: #STANDARD, value: 'OrderID' },
- //   description: { type: #STANDARD, value: 'Name' }
+    typeNamePlural: 'Orders',
+    title: { type: #STANDARD, value: 'OrderID' },
+    description: { type: #STANDARD, value: 'Name' }
   },
   presentationVariant: [ {
     sortOrder: [ { by: 'CreationDate', direction: #DESC } ],
@@ -71,12 +71,15 @@ annotate view ZC_ORDER_MASTER with
 
   @UI: {
     identification: [ { position: 30, label: 'Status' } ],
-    lineItem: [ { position: 30, label: 'Status', importance: #HIGH } ],
+    lineItem: [ { position: 30, label: 'Status', importance: #HIGH, criticality: 'StatusCriticality' } ],
     selectionField: [ { position: 20 } ],
     fieldGroup: [ { qualifier: 'DetailGroup', position: 30, label: 'Status' } ]
   }
   @UI.textArrangement: #TEXT_ONLY
   Status;
+  
+  @UI.hidden: true
+  StatusCriticality;
 
   @UI: {
     identification: [ { position: 40, label: 'Customer' } ],
@@ -85,6 +88,7 @@ annotate view ZC_ORDER_MASTER with
     fieldGroup: [ { qualifier: 'DetailGroup', position: 20, label: 'Customer' } ]
   }
   Customer;
+  @UI.textArrangement: #TEXT_ONLY
 
   @UI.hidden: true
   CustomerName;
@@ -110,10 +114,13 @@ annotate view ZC_ORDER_MASTER with
   CancellationDate;
 
   @UI: {
-    identification: [ { position: 80, label: 'Country'  } ],
-    fieldGroup: [ { qualifier: 'DetailGroup', position: 40, label: 'Country'   } ]
+    identification: [ { position: 80, label: 'Delivery Country'  } ],
+    fieldGroup: [ { qualifier: 'DetailGroup', position: 40, label: 'Delivery Country'   } ]
   }
+  @UI.textArrangement: #TEXT_ONLY
   DeliveryCountry;
+  @UI.hidden: true
+  DeliveryCountryName;
     
   @UI: {
     identification: [ { position: 90, label: 'Total Price' } ],
@@ -123,7 +130,7 @@ annotate view ZC_ORDER_MASTER with
 
   TotalPrice;
 
-  @UI.hidden: false
+  @UI.hidden: true
   CurrencyCode;
 
   @UI: {
