@@ -15,7 +15,9 @@ CLASS zcl_ysv_abap_course_basics DEFINITION
 ENDCLASS.
 
 
-CLASS zcl_ysv_abap_course_basics IMPLEMENTATION.
+
+CLASS ZCL_YSV_ABAP_COURSE_BASICS IMPLEMENTATION.
+
 
   METHOD if_oo_adt_classrun~main.
 
@@ -155,7 +157,7 @@ CLASS zcl_ysv_abap_course_basics IMPLEMENTATION.
         et_travel_ids_task8_3 = lt_task8_3
     ).
 
-    out->write( 'Results from internal_tables method:' ).
+    out->write( 'Results from Open SQL method:' ).
     out->write( cl_abap_char_utilities=>newline ).
 
     out->write( '1. Agency 070001 with 20 JPY booking fee:' ).
@@ -177,6 +179,7 @@ CLASS zcl_ysv_abap_course_basics IMPLEMENTATION.
 
   ENDMETHOD.
 
+
   METHOD zif_abap_course_basics~calculator.
     rv_result = gc_invalid_result.
 
@@ -197,6 +200,7 @@ CLASS zcl_ysv_abap_course_basics IMPLEMENTATION.
         RETURN.
     ENDCASE.
   ENDMETHOD.
+
 
   METHOD zif_abap_course_basics~date_parsing.
     DATA: lv_day   TYPE string,
@@ -224,6 +228,7 @@ CLASS zcl_ysv_abap_course_basics IMPLEMENTATION.
     ENDIF.
 
   ENDMETHOD.
+
 
   METHOD zif_abap_course_basics~fizz_buzz.
     DATA: lv_result TYPE string,
@@ -257,6 +262,7 @@ CLASS zcl_ysv_abap_course_basics IMPLEMENTATION.
     GET TIME STAMP FIELD rv_result.
 
   ENDMETHOD.
+
 
   METHOD zif_abap_course_basics~hello_world.
     DATA(user_id) = sy-uname.
@@ -349,7 +355,7 @@ CLASS zcl_ysv_abap_course_basics IMPLEMENTATION.
       lc_jpy_to_usd TYPE p LENGTH 8 DECIMALS 4 VALUE '140.0000',
       lc_threshold  TYPE p LENGTH 8 DECIMALS 2 VALUE '2000.00'.
 
-    " Task 8.1
+*     Task 8.1
     SELECT travel_id
       FROM ztravel_ys
       WHERE agency_id = '070001'
@@ -357,7 +363,7 @@ CLASS zcl_ysv_abap_course_basics IMPLEMENTATION.
         AND currency_code = 'JPY'
       INTO TABLE @et_travel_ids_task8_1.
 
-    " Task 8.2
+*     Task 8.2
     SELECT travel_id FROM ztravel_ys
       WHERE currency_code = 'USD'
         AND total_price > @lc_threshold
@@ -373,7 +379,7 @@ CLASS zcl_ysv_abap_course_basics IMPLEMENTATION.
         AND total_price > ( @lc_threshold * @lc_jpy_to_usd )
       APPENDING TABLE @et_travel_ids_task8_2.
 
-    " Task 8.3
+*     Task 8.3
     SELECT travel_id
       FROM ztravel_ys
       WHERE currency_code = 'EUR'
@@ -415,4 +421,3 @@ CLASS zcl_ysv_abap_course_basics IMPLEMENTATION.
 
   ENDMETHOD.
 ENDCLASS.
-
