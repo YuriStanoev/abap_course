@@ -3,6 +3,7 @@ RISK LEVEL HARMLESS
 DURATION SHORT.
 
   PRIVATE SECTION.
+  CONSTANTS: c_error_result TYPE string VALUE '-2147483648'.
     DATA: cut TYPE REF TO zcl_ysv_abap_course_basics.
 
     METHODS:
@@ -33,9 +34,15 @@ DURATION SHORT.
       date_parsing_invalid           FOR TESTING,
 
       " scrabble_score tests
+      scrabble_score_compare
+      IMPORTING i_word TYPE string
+                i_expected_result TYPE i,
       scrabble_score_normal          FOR TESTING,
       scrabble_score_empty           FOR TESTING,
+      scrabble_score_single_char     FOR TESTING,
+      scrabble_score_non_alpha       FOR TESTING,
       scrabble_score_case_insensitiv FOR TESTING,
+      scrabble_score_all_letters     FOR Testing,
 
       " get_current_date_time test
       get_current_date_time_valid    FOR TESTING,
@@ -45,6 +52,9 @@ DURATION SHORT.
       open_sql_basic                 FOR TESTING.
 ENDCLASS.
 
+
+
+
 CLASS ltcl_ysv_abap_course_basics IMPLEMENTATION.
 
   METHOD setup.
@@ -53,6 +63,7 @@ CLASS ltcl_ysv_abap_course_basics IMPLEMENTATION.
 
   METHOD teardown.
     CLEAR cut.
+
   ENDMETHOD.
 
 
@@ -80,7 +91,7 @@ CLASS ltcl_ysv_abap_course_basics IMPLEMENTATION.
     DATA(result_div_zero) = cut->zif_abap_course_basics~calculator( iv_first_number = 5
                                                                     iv_second_number = 0
                                                                     iv_operator = '/' ).
-    DATA(expected_result) = '-2147483648'.
+    DATA(expected_result) = c_error_result.
     cl_abap_unit_assert=>assert_equals( exp = expected_result
                                         act = result_div_zero ).
   ENDMETHOD.
@@ -89,7 +100,7 @@ CLASS ltcl_ysv_abap_course_basics IMPLEMENTATION.
     DATA(result_inv_operator) = cut->zif_abap_course_basics~calculator( iv_first_number = 8
                                                                         iv_second_number = 2
                                                                         iv_operator = 'y' ).
-    DATA(expected_result) = '-2147483648'.
+    DATA(expected_result) = c_error_result.
     cl_abap_unit_assert=>assert_equals( exp = expected_result
                                         act =  result_inv_operator ).
   ENDMETHOD.
@@ -178,6 +189,12 @@ CLASS ltcl_ysv_abap_course_basics IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD get_current_date_time_valid.
+  DATA(mock_time) = NEW zcl_mock_time_provider( iv_fixed_timestamp = '20250629123456' ).
+  cut = NEW zcl_ysv_abap_course_basics( io_time_provider = mock_time ).
+
+  DATA(result) = cut->zif_abap_course_basics~get_current_date_time( ).
+  DATA: expected TYPE timestampl VALUE '20250629123456'.
+  cl_abap_unit_assert=>assert_equals( exp = expected act = result ).
 
   ENDMETHOD.
 
@@ -205,21 +222,38 @@ CLASS ltcl_ysv_abap_course_basics IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD scrabble_score_case_insensitiv.
-
+  scrabble_score_compare( i_word = 'AbAp' i_expected_result = 20 ).
   ENDMETHOD.
 
   METHOD scrabble_score_empty.
-
+  scrabble_score_compare( i_word = ' ' i_expected_result = 0 ).
   ENDMETHOD.
 
   METHOD scrabble_score_normal.
-
+  scrabble_score_compare( i_word = 'ABAP' i_expected_result = 20 ).
   ENDMETHOD.
 
   METHOD date_parsing_assert_convert.
     cl_abap_unit_assert=>assert_equals( exp = i_date_expected
                                         act = cut->zif_abap_course_basics~date_parsing( iv_date = i_date ) ).
 
+  ENDMETHOD.
+
+  METHOD scrabble_score_non_alpha.
+  scrabble_score_compare( i_word = '123456' i_expected_result = 0 ).
+  ENDMETHOD.
+
+  METHOD scrabble_score_single_char.
+  scrabble_score_compare( i_word = 'Z' i_expected_result = 26 ).
+  ENDMETHOD.
+
+  METHOD scrabble_score_compare.
+  cl_abap_unit_assert=>assert_equals( exp = i_expected_result
+                                      act = cut->zif_abap_course_basics~scrabble_score( iv_word = i_word ) ).
+  ENDMETHOD.
+
+  METHOD scrabble_score_all_letters.
+  scrabble_score_compare( i_word = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' i_expected_result = 351 ).
   ENDMETHOD.
 
 ENDCLASS.

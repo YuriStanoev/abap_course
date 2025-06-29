@@ -7,16 +7,19 @@ CLASS zcl_ysv_abap_course_basics DEFINITION
 
     INTERFACES if_oo_adt_classrun.
     INTERFACES zif_abap_course_basics.
+    METHODS: constructor IMPORTING io_time_provider TYPE REF TO zif_time_provider OPTIONAL.
 
   PROTECTED SECTION.
   PRIVATE SECTION.
     CONSTANTS:
         gc_invalid_result TYPE i VALUE '-2147483648'.
+        DATA mo_time_provider TYPE REF TO zif_time_provider.
+
 ENDCLASS.
 
 
 
-CLASS ZCL_YSV_ABAP_COURSE_BASICS IMPLEMENTATION.
+CLASS zcl_ysv_abap_course_basics IMPLEMENTATION.
 
 
   METHOD if_oo_adt_classrun~main.
@@ -259,8 +262,8 @@ CLASS ZCL_YSV_ABAP_COURSE_BASICS IMPLEMENTATION.
 
 
   METHOD zif_abap_course_basics~get_current_date_time.
-    GET TIME STAMP FIELD rv_result.
-
+**    GET TIME STAMP FIELD rv_result.
+    rv_result = mo_time_provider->get_current_timestamp( ).
   ENDMETHOD.
 
 
@@ -420,4 +423,14 @@ CLASS ZCL_YSV_ABAP_COURSE_BASICS IMPLEMENTATION.
     ENDDO.
 
   ENDMETHOD.
+  METHOD constructor.
+IF io_time_provider IS BOUND.
+      mo_time_provider = io_time_provider.
+    ELSE.
+      mo_time_provider = NEW zcl_system_time_provider( ).
+    ENDIF.
+  ENDMETHOD.
+
+
+
 ENDCLASS.
